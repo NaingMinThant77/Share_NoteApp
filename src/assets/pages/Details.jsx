@@ -24,7 +24,7 @@ const Details = () => {
     return (
         <>
             {
-                loading ? (<><div className="flex justify-center items-center w-full">
+                loading ? (<div className="flex justify-center items-center w-full">
                     <Watch
                         visible={loading}
                         height="80"
@@ -35,7 +35,7 @@ const Details = () => {
                         wrapperStyle={{}}
                         wrapperClass=""
                     />
-                </div></>) : (<section className='px-10 mt-10'>
+                </div>) : (<section className='px-10 mt-10'>
                     <div className="flex justify-end mr-4">
                         <Link to={"/"}>
                             <FaArrowAltCircleLeft className="w-9 h-9 text-teal-600 " />
@@ -43,7 +43,7 @@ const Details = () => {
                     </div>
                     <div className='border-t-4 border-t-teal-600 shadow-lg p-3 mt-4'>
                         <h3 className='text-3xl font-medium'>{note.title}</h3>
-                        <div>
+                        <div className="flex gap-4 my-2">
                             <p className="flex items-center gap-1 font-medium text-gray-600 text-sm"><FaUserCircle className="w-4 h-4" /> {note.creater}</p>
                             <p className="flex items-center gap-1 font-medium text-gray-600 text-sm"> <SlCalender className="w-4 h-4" /> {note.createdAt
                                 ? format(note.createdAt, "yyyy-MM-dd")

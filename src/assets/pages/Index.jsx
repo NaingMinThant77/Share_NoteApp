@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import Note from "../components/Note"
-import Plus from "../components/Plus"
 import { Watch } from "react-loader-spinner" // npm install react-loader-spinner --save
+
+import { ToastContainer, toast } from 'react-toastify';
 
 const Index = () => {
     const [notes, setNotes] = useState([]);
@@ -17,8 +18,22 @@ const Index = () => {
     useEffect(_ => {
         getNotes()
     }, [])
+
+    const customAlert = (message) => {
+        toast.success(message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+        });
+    }
+
     return (
-        <section className='flex flex-wrap gap-6 px-10 mt-10'>
+        <section className='flex justify-center flex-wrap gap-6 px-10 mt-10'>
             {
                 loading && notes.length < 1 ? (<div className="flex justify-center items-center w-full">
                     <Watch
@@ -31,13 +46,22 @@ const Index = () => {
                         wrapperStyle={{}}
                         wrapperClass=""
                     />
-                </div>) : notes.map(note => (<Note key={note._id} note={note} />))
+                </div>) : notes.map(note => (<Note key={note._id} note={note} getNotes={getNotes} customAlert={customAlert} />))
             }
-            <Plus />
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick={false}
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </section>
     )
 }
 
 export default Index
-
-// 57: 02
