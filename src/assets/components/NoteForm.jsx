@@ -1,16 +1,20 @@
 import { FaArrowAltCircleLeft } from "react-icons/fa";
+import { FaUpload } from "react-icons/fa6";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { Formik, Form, Field } from 'formik'; // npm install formik --save
 import StyleErrorMessage from "./StyleErrorMessage";
 
 import * as Yup from "yup"; // npm install -S yup
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ToastContainer, toast } from 'react-toastify'; // npm install --save react-toastify
 
 const NoteForm = ({ isCreate }) => {
     const [redirect, setRedirect] = useState(false);
     const [oldNote, setOldNote] = useState({})
+    const fileRef = useRef();
+    const [previewImg, setPreviewImg] = useState(null);
+    const [isUpload, setIsUpload] = useState(false)
 
     const { id } = useParams();
 
@@ -33,8 +37,11 @@ const NoteForm = ({ isCreate }) => {
     const initialValues = {
         title: isCreate ? "" : oldNote.title,
         content: isCreate ? "" : oldNote.content,
-        note_id: isCreate ? "" : oldNote._id
+        note_id: isCreate ? "" : oldNote._id,
+        cover_image: isCreate ? null : oldNote.cover_image
     }
+
+    const SUPPORTED_FORMATS = ["image/png", "image/jpg", "image/jpeg"]
 
     const NoteFormSchema = Yup.object({
         title: Yup.string()
@@ -43,8 +50,22 @@ const NoteForm = ({ isCreate }) => {
             .required("Title is required!"),
         content: Yup.string()
             .min(5, "Content is too short!")
-            .required("Content is required!")
+            .required("Content is required!"),
+        cover_image: Yup.mixed().nullable()
+            .test("FILE_FORMAT", "File type is not support.", (value) => !value || SUPPORTED_FORMATS.includes(value.type))
     })
+
+    const handleImageChange = (event, setFieldValue) => {
+        const selectedImage = event.target.files[0]
+        setPreviewImg(URL.createObjectURL(selectedImage))
+        setFieldValue("cover_image", selectedImage)
+    }
+
+    const clearPreviewImg = (setFieldValue) => {
+        setPreviewImg(null);
+        setFieldValue("cover_image", null)
+        fileRef.current.value = ""
+    }
 
     const sumitHandler = async (values) => {
         let API = `${import.meta.env.VITE_API}`;
@@ -57,12 +78,21 @@ const NoteForm = ({ isCreate }) => {
             API = `${import.meta.env.VITE_API}/edit`
             method = "PUT"
         }
+
+        const formData = new FormData();
+        formData.append("title", values.title)
+        formData.append("content", values.content)
+        formData.append("cover_image", values.cover_image)
+        formData.append("note_id", values.note_id)
+
         const response = await fetch(API, {
             method,
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(values) //{ content: values.content}
+            // headers: {
+            //     // "Content-Type": "application/json"
+            //     "Content-Type": "multipart/form-data"
+            // },
+            // body: JSON.stringify(values) //{ content: values.content}
+            body: formData
         });
 
         if (response.status === 201 || response.status === 200) {
@@ -106,26 +136,61 @@ const NoteForm = ({ isCreate }) => {
             </div>
             {/* validate={validate} */}
             <Formik initialValues={initialValues} validationSchema={NoteFormSchema} onSubmit={sumitHandler} enableReinitialize={true}>
-                {/* {({ errors, touched }) => ( */}
-                <Form>
-                    <div className=''>
-                        <label htmlFor="title" className='font-medium block'>Note Title</label>
-                        <Field type="text" name="title" id="title" className='text-lg border-2 border-teal-600 py-1 w-full rounded-lg' />
-                        {/* {
+                {({ errors, touched, values, setFieldValue }) => (
+                    <Form encType="multipart/form-data">
+                        <div className=''>
+                            <label htmlFor="title" className='font-medium block'>Note Title</label>
+                            <Field type="text" name="title" id="title" className='text-lg border-2 border-teal-600 py-1 w-full rounded-lg' />
+                            {/* {
                             errors.title && touched.title && <p>{errors.title}</p>
                         } */}
-                        <StyleErrorMessage name="title" />
-                    </div>
-                    <div className='mt-3'>
-                        <label htmlFor="content" className='font-medium block'>Note Description</label>
-                        <Field as="textarea" rows={4} name="content" id="content" className='text-lg border-2 border-teal-600 py-1 w-full rounded-lg' />
-                        <StyleErrorMessage name="content" />
-                    </div>
-                    <Field type="text" name="note_id" id="note_id" hidden />
-                    <button type="submit" className='text-white text-center font-medium bg-teal-600 py-3 w-full'>{isCreate ? "Share Note" : "Update Note"}</button>
-                </Form>
+                            <StyleErrorMessage name="title" />
+                        </div>
 
-                {/* )} */}
+                        <div className='mt-3'>
+                            <label htmlFor="content" className='font-medium block'>Note Description</label>
+                            <Field as="textarea" rows={4} name="content" id="content" className='text-lg border-2 border-teal-600 py-1 w-full rounded-lg' />
+                            <StyleErrorMessage name="content" />
+                        </div>
+                        <div className='my-3'>
+                            <div className="flex items-center justify-between">
+                                <label htmlFor="cover_image" className='font-medium block'>Cover Image <span className="text-xs font-medium">(Optional)</span> </label>
+                                {
+                                    previewImg && <p className="text-base font-medium text-teal-600 cursor-pointer" onClick={_ => {
+                                        clearPreviewImg(_ => {
+                                            setFieldValue
+                                        })
+                                    }}>Clear</p>
+                                }
+                            </div>
+                            {
+                                !isUpload ? (<p className="text-base font-medium text-teal-600 cursor-pointer" onClick={_ => {
+                                    setIsUpload(true)
+                                }}>Upload Cover Image</p>) : (<p className="text-base font-medium text-teal-600 cursor-pointer" onClick={_ => {
+                                    setIsUpload(false)
+                                }}>Disable Cover Image</p>)
+                            }
+                            {
+                                isUpload && (<>  <input type="file" name="cover_image" id="cover_image" hidden ref={fileRef} onChange={e => handleImageChange(e, setFieldValue)} />
+                                    <div className=" border border-dashed border-teal-600 flex items-center justify-center text-teal-600 h-60 cursor-pointer rounded-lg relative overflow-hidden" onClick={_ => {
+                                        fileRef.current.click()
+                                    }}>
+                                        <FaUpload className="w-6 h-6 z-20" />
+                                        {
+                                            isCreate ? (<>
+                                                {
+                                                    previewImg && <img src={previewImg} alt={"prev"} className="absolute top-0 left-0 w-full h-full object-cover overflow-hidden opacity-80 z-10" />
+                                                }
+                                            </>) : <img src={previewImg ? previewImg : `${import.meta.env.VITE_API}/${oldNote.cover_image}`} alt={"prev"} className="absolute top-0 left-0 w-full h-full object-cover overflow-hidden opacity-80 z-10" />
+                                        }
+                                    </div></>)
+                            }
+                            <StyleErrorMessage name="cover_image" />
+                        </div>
+                        <button type="submit" className='text-white text-center font-medium bg-teal-600 py-3 w-full'>{isCreate ? "Share Note" : "Update Note"}</button>
+                    </Form>
+
+                )}
             </Formik>
         </section >
     )
