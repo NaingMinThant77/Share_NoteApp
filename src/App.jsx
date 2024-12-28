@@ -4,6 +4,8 @@ import Create from './assets/pages/Create';
 import Edit from './assets/pages/Edit';
 import Index from './assets/pages/Index';
 import Details from './assets/pages/Details';
+import Register from './assets/pages/Register';
+import Login from './assets/pages/Login';
 
 
 const router = createBrowserRouter([
@@ -13,6 +15,8 @@ const router = createBrowserRouter([
       { path: "/create", element: <Create /> },
       { path: "/edit/:id", element: <Edit /> },
       { path: "/notes/:id", element: <Details /> },
+      { path: "/register", element: <Register /> },
+      { path: "/login", element: <Login /> },
     ]
   }
 ])

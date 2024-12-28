@@ -1,23 +1,39 @@
 import { useEffect, useState } from "react"
 import Note from "../components/Note"
-import { Watch } from "react-loader-spinner" // npm install react-loader-spinner --save
+import { TailSpin } from "react-loader-spinner" // npm install react-loader-spinner --save
 
 import { ToastContainer, toast } from 'react-toastify';
 
 const Index = () => {
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
-    const getNotes = async () => {
+    const getNotes = async (pageNum) => {
         setLoading(true);
-        const response = await fetch(`${import.meta.env.VITE_API}/notes`)
-        const notes = await response.json();
+        const response = await fetch(`${import.meta.env.VITE_API}/notes?page=${pageNum}`)
+        const { notes, totalNotes, totalPages } = await response.json();
+        setTotalPages(totalPages);
         setNotes(notes);
         setLoading(false);
     }
+
     useEffect(_ => {
-        getNotes()
-    }, [])
+        getNotes(currentPage)
+    }, [currentPage])
+
+    const handlePre = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1)
+        }
+    }
+
+    const handleNext = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1)
+        }
+    }
 
     const customAlert = (message) => {
         toast.success(message, {
@@ -36,11 +52,11 @@ const Index = () => {
         <section className='flex justify-center flex-wrap gap-6 px-10 mt-10'>
             {
                 loading && notes.length < 1 ? (<div className="flex justify-center items-center w-full">
-                    <Watch
+                    <TailSpin
                         visible={loading}
                         height="80"
                         width="80"
-                        radius="48"
+                        radius="1"
                         color="#4fa94d"
                         ariaLabel="watch-loading"
                         wrapperStyle={{}}
@@ -48,6 +64,18 @@ const Index = () => {
                     />
                 </div>) : notes.map(note => (<Note key={note._id} note={note} getNotes={getNotes} customAlert={customAlert} />))
             }
+            <div className="w-full flex items-center justify-center gap-3">
+                {
+                    currentPage > 1 && (
+                        <button type="button" className="text-white font-medium bg-teal-600 px-3 py-1" onClick={handlePre}>Prev Page</button>
+                    )
+                }
+                {
+                    currentPage < totalPages && (
+                        <button type="button" className="text-white font-medium bg-teal-600 px-3 py-1" onClick={handleNext}>Next Page</button>
+                    )
+                }
+            </div>
             <ToastContainer
                 position="top-right"
                 autoClose={5000}
