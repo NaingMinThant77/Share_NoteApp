@@ -21,6 +21,8 @@ const Note = ({ note, getNotes, customAlert }) => {
         if (response.status === 204) {
             customAlert("Post deleted")
             getNotes();
+        } else {
+            customAlert("You are not author", true)
         }
     }
 
@@ -31,8 +33,14 @@ const Note = ({ note, getNotes, customAlert }) => {
             <div className="flex items-center justify-between gap-2 mt-2 border-t pt-3">
                 <p className="text-base font-medium">{format(createdAt, 'yyyy-MM-dd')}</p>
                 <div className="flex items-center justify-end gap-2">
-                    <MdDeleteForever className="w-7 h-7 text-red-600 cursor-pointer" onClick={deleteNote} />
-                    <Link to={"/edit/" + _id}><FaRegEdit className="w-6 h-6 text-teal-600" /></Link>
+                    {
+                        token && note.creater.toString() === token.userId && (
+                            <>
+                                <MdDeleteForever className="w-7 h-7 text-red-600 cursor-pointer" onClick={deleteNote} />
+                                <Link to={"/edit/" + _id}><FaRegEdit className="w-6 h-6 text-teal-600" /></Link>
+                            </>
+                        )
+                    }
                     <Link to={"/notes/" + _id}><FaEye className="w-6 h-6 text-gray-600" /></Link>
                 </div>
             </div>
