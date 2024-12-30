@@ -5,11 +5,14 @@ import { Formik, Form, Field } from 'formik'; // npm install formik --save
 import StyleErrorMessage from "./StyleErrorMessage";
 
 import * as Yup from "yup"; // npm install -S yup
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import { ToastContainer, toast } from 'react-toastify'; // npm install --save react-toastify
 
+import { UserContext } from "../../contexts/UserContext";
+
 const NoteForm = ({ isCreate }) => {
+    const { token } = useContext(UserContext)
     const [redirect, setRedirect] = useState(false);
     const [oldNote, setOldNote] = useState({})
     const fileRef = useRef();
@@ -87,10 +90,11 @@ const NoteForm = ({ isCreate }) => {
 
         const response = await fetch(API, {
             method,
-            // headers: {
-            //     // "Content-Type": "application/json"
-            //     "Content-Type": "multipart/form-data"
-            // },
+            headers: {
+                //     // "Content-Type": "application/json"
+                //     "Content-Type": "multipart/form-data"
+                Authorization: `Bearer ${token.token}`
+            },
             // body: JSON.stringify(values) //{ content: values.content}
             body: formData
         });

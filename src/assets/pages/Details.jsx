@@ -49,7 +49,7 @@ const Details = () => {
                         }
                         <h3 className='text-3xl font-medium'>{note.title}</h3>
                         <div className="flex gap-4 my-2">
-                            <p className="flex items-center gap-1 font-medium text-gray-600 text-sm"><FaUserCircle className="w-4 h-4" /> {note.creater}</p>
+                            <p className="flex items-center gap-1 font-medium text-gray-600 text-sm"><FaUserCircle className="w-4 h-4" /> {note.creater ? note.creater.username : "Unknown User"}</p>
                             <p className="flex items-center gap-1 font-medium text-gray-600 text-sm"> <SlCalender className="w-4 h-4" /> {note.createdAt
                                 ? format(note.createdAt, "yyyy-MM-dd")
                                 : "Unknown Date"}</p>

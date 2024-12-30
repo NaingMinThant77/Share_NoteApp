@@ -7,13 +7,14 @@ import Details from './assets/pages/Details';
 import Register from './assets/pages/Register';
 import Login from './assets/pages/Login';
 
+import isLoginLoader from "./utils/isLogin"
 
 const router = createBrowserRouter([
   {
     path: "/", element: <Main />, children: [
       { index: true, element: <Index /> },
-      { path: "/create", element: <Create /> },
-      { path: "/edit/:id", element: <Edit /> },
+      { path: "/create", loader: isLoginLoader, element: <Create /> },
+      { path: "/edit/:id", loader: isLoginLoader, element: <Edit /> },
       { path: "/notes/:id", element: <Details /> },
       { path: "/register", element: <Register /> },
       { path: "/login", element: <Login /> },

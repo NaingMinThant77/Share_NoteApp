@@ -51,7 +51,7 @@ const Index = () => {
     return (
         <section className='flex justify-center flex-wrap gap-6 px-10 mt-10'>
             {
-                loading && notes.length < 1 ? (<div className="flex justify-center items-center w-full">
+                loading ? (<div className="flex justify-center items-center w-full">
                     <TailSpin
                         visible={loading}
                         height="80"
@@ -62,7 +62,11 @@ const Index = () => {
                         wrapperStyle={{}}
                         wrapperClass=""
                     />
-                </div>) : notes.map(note => (<Note key={note._id} note={note} getNotes={getNotes} customAlert={customAlert} />))
+                </div>) : notes.length === 0 ? (
+                    <div className="flex justify-center items-center w-full">
+                        <p>No Note was shared yet!</p>
+                    </div>
+                ) : notes.map(note => (<Note key={note._id} note={note} getNotes={getNotes} customAlert={customAlert} />))
             }
             <div className="w-full flex items-center justify-center gap-3">
                 {
