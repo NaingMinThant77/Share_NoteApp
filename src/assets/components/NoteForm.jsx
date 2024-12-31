@@ -144,7 +144,7 @@ const NoteForm = ({ isCreate }) => {
             </div>
             {/* validate={validate} */}
             <Formik initialValues={initialValues} validationSchema={NoteFormSchema} onSubmit={sumitHandler} enableReinitialize={true}>
-                {({ errors, touched, values, setFieldValue }) => (
+                {({ errors, touched, values, setFieldValue, isSubmitting }) => (
                     <Form encType="multipart/form-data">
                         <div className=''>
                             <label htmlFor="title" className='font-medium block'>Note Title</label>
@@ -195,7 +195,7 @@ const NoteForm = ({ isCreate }) => {
                             }
                             <StyleErrorMessage name="cover_image" />
                         </div>
-                        <button type="submit" className='text-white text-center font-medium bg-teal-600 py-3 w-full'>{isCreate ? "Share Note" : "Update Note"}</button>
+                        <button type="submit" className='text-white text-center font-medium bg-teal-600 py-3 w-full' disabled={isSubmitting}> {isSubmitting ? "isSubmitting ..." : isCreate ? "Share Note" : "Update Note"}</button>
                     </Form>
 
                 )}

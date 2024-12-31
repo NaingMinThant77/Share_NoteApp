@@ -3,7 +3,8 @@ import { UserContext } from '../../contexts/UserContext'
 import { useContext } from 'react'
 
 const Nav = () => {
-    const { token, updateToken } = useContext(UserContext);
+    const { updateToken } = useContext(UserContext)
+    const token = localStorage.getItem("token")
 
     const logoutHandler = () => {
         updateToken(null)
@@ -15,7 +16,7 @@ const Nav = () => {
                 <Link to={"/"} className='text-teal-600 font-bold text-4xl'>SHARENOTE.io</Link>
                 <div className='flex gap-3'>
                     {
-                        token ? (<>
+                        token !== "null" ? (<>
                             <Link to={"/create"} className='text-teal-600 font-medium'>SHARE NOTE</Link>
                             <button type='button' className='text-teal-600 font-medium' onClick={logoutHandler}>Logout</button>
                         </>

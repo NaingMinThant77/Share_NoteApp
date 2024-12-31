@@ -70,7 +70,6 @@ const AuthForm = ({ isLogin }) => {
         } else if (response.status === 401) {
             toastFire(responseData.message)
         }
-
     }
 
     if (redirect) {
@@ -92,7 +91,7 @@ const AuthForm = ({ isLogin }) => {
                 theme="light"
             />
             <Formik initialValues={initialValues} validationSchema={AuthFormSchema} onSubmit={submitHandler} >
-                {() => (
+                {({ isSubmitting }) => (
                     <Form className='w-1/2 mx-auto'>
                         <h1 className='text-center font-bold text-4xl text-teal-600 my-4'>{isLogin ? "Login" : "Register"}</h1>
                         {
@@ -112,7 +111,11 @@ const AuthForm = ({ isLogin }) => {
                             <Field type="password" name="password" id="password" className='text-lg border-2 border-teal-600 py-1 w-full rounded-lg' />
                             <StyleErrorMessage name="password" />
                         </div>
-                        <button type="submit" className='text-white text-center font-medium bg-teal-600 py-3 w-full'>{isLogin ? "Login" : "Register"}</button>
+                        <button type="submit" className='text-white text-center font-medium bg-teal-600 py-3 w-full' disabled={isSubmitting}>{isSubmitting
+                            ? "Submitting ...."
+                            : isLogin
+                                ? "Login"
+                                : "Register"}</button>
                     </Form>
                 )}
             </Formik></>

@@ -11,6 +11,27 @@ const Note = ({ note, getNotes, customAlert }) => {
     const { token } = useContext(UserContext)
     const { _id, title, content, createdAt } = note;
 
+    const handleDeleteNote = async () => {
+        const localToken = JSON.parse(localStorage.getItem("token"));
+        if (!localToken) {
+            localStorage.setItem("token", null)
+            window.location.reload(false);
+        }
+
+        const response = await fetch(`${import.meta.env.VITE_API}/status`, {
+            headers: {
+                Authorization: `Bearer ${localToken.token}`
+            }
+        })
+
+        if (response.status === 401) {
+            localStorage.setItem("token", null)
+            window.location.reload(false);
+        } else {
+            deleteNote()
+        }
+    }
+
     const deleteNote = async () => {
         const response = await fetch(`${import.meta.env.VITE_API}/delete/${_id}`, {
             method: "DELETE",
@@ -36,7 +57,7 @@ const Note = ({ note, getNotes, customAlert }) => {
                     {
                         token && note.creater.toString() === token.userId && (
                             <>
-                                <MdDeleteForever className="w-7 h-7 text-red-600 cursor-pointer" onClick={deleteNote} />
+                                <MdDeleteForever className="w-7 h-7 text-red-600 cursor-pointer" onClick={handleDeleteNote} />
                                 <Link to={"/edit/" + _id}><FaRegEdit className="w-6 h-6 text-teal-600" /></Link>
                             </>
                         )
